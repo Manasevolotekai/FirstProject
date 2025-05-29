@@ -1,23 +1,43 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<configuration>
+<configuration scan="false">
 
-    <appender name="Console" class="ch.qos.logback.core.ConsoleAppender">
+    <include resource="org/springframework/boot/logging/logback/defaults.xml"/>
+    <include resource="org/springframework/boot/logging/logback/console-appender.xml"/>
+
+    <appender name="JSON_CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
         <encoder class="net.logstash.logback.encoder.LoggingEventCompositeJsonEncoder">
             <providers>
-                <timestamp/>
-                <loggerName/>
-                <logLevel/>
-                <threadName/>
-                <message/>
-                <stackTrace/>
-                <mdc/> <!-- Includes traceId, spanId etc. from OpenTelemetry -->
-                <globalCustomFields>{"serviceName":"spring-boot-app"}</globalCustomFields>
+                <timestamp>
+                    <fieldName>timestamp</fieldName>
+                    <pattern>yyyy-MM-dd'T'HH:mm:ss.SSSZ</pattern>
+                </timestamp>
+                <logLevel>
+                    <fieldName>level</fieldName>
+                </logLevel>
+                <loggerName>
+                    <fieldName>logger</fieldName>
+                </loggerName>
+                <threadName>
+                    <fieldName>thread</fieldName>
+                </threadName>
+                <message>
+                    <fieldName>message</fieldName>
+                </message>
+                <mdc>
+                    <includeMdcKeyName>traceId</includeMdcKeyName>
+                    <includeMdcKeyName>spanId</includeMdcKeyName>
+                    <includeMdcKeyName>user-agent</includeMdcKeyName>
+                </mdc>
+                <stackTrace>
+                    <fieldName>exception</fieldName>
+                </stackTrace>
             </providers>
         </encoder>
     </appender>
 
     <root level="INFO">
-        <appender-ref ref="Console"/>
+        <appender-ref ref="JSON_CONSOLE"/>
     </root>
 
+    <logger name="com.evolotek.firstproject" level="DEBUG"/>
 </configuration>

@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
+import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.util.Arrays;
@@ -18,8 +19,10 @@ import static org.hamcrest.Matchers.is;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
-
+// Load only ProductController with no full SpringBoot context
 @WebMvcTest(ProductController.class)
+// Avoid application-wide config that loads unnecessary beans
+@ContextConfiguration(classes = {ProductController.class})
 public class ProductControllerTest {
 
     @Autowired
@@ -30,7 +33,6 @@ public class ProductControllerTest {
 
     @Test
     public void testGetAllProducts() throws Exception {
-        // Prepare mock data
         Product p1 = new Product("Product 1", "Description 1", 10.0);
         p1.setId(1L);
         Product p2 = new Product("Product 2", "Description 2", 20.0);
@@ -38,14 +40,12 @@ public class ProductControllerTest {
 
         List<Product> products = Arrays.asList(p1, p2);
 
-        // Mock the service method
         Mockito.when(productService.getAllProducts()).thenReturn(products);
 
-        // Perform GET /api/products and verify response
         mockMvc.perform(get("/api/products")
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$", hasSize(2))) // expect array of size 2
+                .andExpect(jsonPath("$", hasSize(2)))
                 .andExpect(jsonPath("$[0].id", is(1)))
                 .andExpect(jsonPath("$[0].name", is("Product 1")))
                 .andExpect(jsonPath("$[0].description", is("Description 1")))
@@ -55,5 +55,4 @@ public class ProductControllerTest {
                 .andExpect(jsonPath("$[1].description", is("Description 2")))
                 .andExpect(jsonPath("$[1].price", is(20.0)));
     }
-
 }

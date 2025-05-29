@@ -5,20 +5,16 @@ receivers:
       http:
 
 exporters:
-  loki:
-    endpoint: "http://loki:3100/loki/api/v1/push"
+  logging: {}
 
-  logging:
-    logLevel: debug
-
-  otlp:
-    endpoint: "http://localhost:4317"  # optional if exporting to another collector
+ # loki:
+  #  endpoint: "http://loki:3100/loki/api/v1/push"
 
 service:
   pipelines:
     logs:
       receivers: [otlp]
-      exporters: [loki, logging]
+      exporters: [logging]
 
     traces:
       receivers: [otlp]
